@@ -1,0 +1,37 @@
+# =============================================
+#  NeMo Guardrails — Output Rails (Colang 2.0)
+#  Ensures AI responses are safe, relevant,
+#  and free from sensitive data leakage
+# =============================================
+
+# ------- OUTPUT CONTENT CHECK -------
+define bot remove harmful content
+  "I want to make sure I give you safe and helpful information. Let me rephrase that in a way that focuses on your data analysis."
+
+define subflow self check output
+  $allowed = execute self_check_output
+  if not $allowed
+    bot remove harmful content
+    stop
+
+
+# ------- PII OUTPUT CHECK -------
+define subflow check pii output
+  $has_pii = execute check_pii_in_output
+  if $has_pii
+    bot inform pii redacted
+    stop
+
+define bot inform pii redacted
+  "I noticed my response contained some personal information, so I've removed it to protect privacy. Here's the cleaned version of the analysis."
+
+
+# ------- RELEVANCE CHECK -------
+define subflow check response relevance
+  $is_relevant = execute check_output_relevance
+  if not $is_relevant
+    bot redirect response to data
+    stop
+
+define bot redirect response to data
+  "Let me focus back on your data analysis. Here's what I found in your dataset..."

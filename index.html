@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Scientist Agent — Your Smart Data Assistant</title>
+    <meta name="description"
+        content="Upload your data and let our AI Data Scientist Agent analyze it automatically. No coding or technical knowledge required.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <!-- Outer Boundary -->
+                        <circle cx="20" cy="20" r="18" stroke="url(#logoGrad)" stroke-width="1" opacity="0.3" />
+
+                        <!-- Intersecting Arcs (Globe Structure) -->
+                        <ellipse cx="20" cy="20" rx="18" ry="7" stroke="url(#logoGrad)" stroke-width="1.8"
+                            transform="rotate(45 20 20)" />
+                        <ellipse cx="20" cy="20" rx="18" ry="7" stroke="url(#logoGrad)" stroke-width="1.8"
+                            transform="rotate(-45 20 20)" />
+                        <ellipse cx="20" cy="20" rx="7" ry="18" stroke="url(#logoGrad)" stroke-width="1.8"
+                            transform="rotate(15 20 20)" />
+
+                        <!-- Neural Nodes -->
+                        <circle cx="20" cy="2" r="2.5" fill="url(#logoGrad)" />
+                        <circle cx="20" cy="38" r="2.5" fill="url(#logoGrad)" />
+                        <circle cx="6" cy="10" r="2.2" fill="url(#logoGrad)" />
+                        <circle cx="34" cy="30" r="2.2" fill="url(#logoGrad)" />
+                        <circle cx="6" cy="30" r="2" fill="url(#logoGrad)" />
+                        <circle cx="34" cy="10" r="2" fill="url(#logoGrad)" />
+                        <circle cx="20" cy="20" r="3.5" fill="url(#logoGrad)" />
+
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#FAB12F" />
+                                <stop offset="50%" stop-color="#FA812F" />
+                                <stop offset="100%" stop-color="#DD0303" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">DataMind <span class="logo-ai">AI</span></span>
+            </div>
+            <div class="header-right">
+                <button class="shield-btn" id="shieldBtn" title="Security Status">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span class="shield-label" id="shieldLabel">Protected</span>
+                </button>
+                <div class="header-status" id="headerStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Ready to analyze</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero / Upload Section -->
+        <section class="hero-section" id="heroSection">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                    AI-Powered Data Analysis
+                </div>
+                <h1 class="hero-title">
+                    Turn Your Data Into
+                    <span class="gradient-text">Clear Insights</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Upload your data file and I'll automatically analyze it for you.
+                    No technical knowledge needed — I handle everything.
+                </p>
+
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-inner" id="uploadInner">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="8" y="8" width="48" height="48" rx="12" stroke="url(#upGrad)" stroke-width="2"
+                                    opacity="0.3" />
+                                <path d="M32 20V40M24 28L32 20L40 28" stroke="url(#upGrad)" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <defs>
+                                    <linearGradient id="upGrad" x1="8" y1="8" x2="56" y2="56">
+                                        <stop offset="0%" stop-color="#FAB12F" />
+                                        <stop offset="100%" stop-color="#FA812F" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3 class="upload-title">Drop your CSV file here</h3>
+                        <p class="upload-desc">or click to browse from your computer</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">CSV</span>
+                            <span class="format-tag">TSV</span>
+                            <span class="format-tag">TXT</span>
+                        </div>
+                        <input type="file" id="fileInput" accept=".csv,.tsv,.txt" hidden>
+                    </div>
+                </div>
+
+                <!-- Sample data button -->
+                <button class="sample-btn" id="sampleBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14,2 14,8 20,8" />
+                    </svg>
+                    Try with sample data
+                </button>
+            </div>
+        </section>
+
+        <!-- Processing Section (shown during analysis) -->
+        <section class="processing-section hidden" id="processingSection">
+            <div class="processing-card">
+                <div class="processing-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-icon">🧠</div>
+                </div>
+                <h2 class="processing-title">Analyzing Your Data...</h2>
+                <p class="processing-desc" id="processingText">Understanding what your data is about...</p>
+                <div class="processing-steps">
+                    <div class="p-step active" id="pStep1">
+                        <div class="p-step-icon">📂</div>
+                        <span>Reading data</span>
+                    </div>
+                    <div class="p-step" id="pStep2">
+                        <div class="p-step-icon">🔍</div>
+                        <span>Checking quality</span>
+                    </div>
+                    <div class="p-step" id="pStep3">
+                        <div class="p-step-icon">📊</div>
+                        <span>Finding patterns</span>
+                    </div>
+                    <div class="p-step" id="pStep4">
+                        <div class="p-step-icon">💡</div>
+                        <span>Generating insights</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section (shown after analysis) -->
+        <section class="dashboard-section hidden" id="dashboardSection">
+            <!-- Top Bar -->
+            <div class="dash-topbar">
+                <div class="dash-topbar-left">
+                    <h2 class="dash-title">📊 Analysis Results</h2>
+                    <span class="dash-filename" id="dashFilename"></span>
+                </div>
+                <button class="new-analysis-btn" id="newAnalysisBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    New Analysis
+                </button>
+            </div>
+
+            <!-- Data Overview Cards -->
+            <div class="overview-cards" id="overviewCards">
+                <div class="ov-card">
+                    <div class="ov-card-icon" style="background: rgba(250, 177, 47, 0.15); color: var(--accent-1);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </div>
+                    <div class="ov-card-info">
+                        <span class="ov-card-label">Total Records</span>
+                        <span class="ov-card-value" id="totalRows">—</span>
+                    </div>
+                </div>
+                <div class="ov-card">
+                    <div class="ov-card-icon" style="background: rgba(250, 129, 47, 0.15); color: var(--accent-2);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                    </div>
+                    <div class="ov-card-info">
+                        <span class="ov-card-label">Columns</span>
+                        <span class="ov-card-value" id="totalCols">—</span>
+                    </div>
+                </div>
+                <div class="ov-card">
+                    <div class="ov-card-icon" style="background: rgba(76, 175, 80, 0.15); color: var(--accent-3);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
+                        </svg>
+                    </div>
+                    <div class="ov-card-info">
+                        <span class="ov-card-label">Number Columns</span>
+                        <span class="ov-card-value" id="numericCols">—</span>
+                    </div>
+                </div>
+                <div class="ov-card">
+                    <div class="ov-card-icon" style="background: rgba(221, 3, 3, 0.15); color: var(--accent-4);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                            <line x1="7" y1="7" x2="7.01" y2="7" />
+                        </svg>
+                    </div>
+                    <div class="ov-card-info">
+                        <span class="ov-card-label">Category Columns</span>
+                        <span class="ov-card-value" id="categoryCols">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Quality Section -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">🧹 Data Quality Report</h3>
+                    <span class="section-badge" id="qualityBadge">Good</span>
+                </div>
+                <div class="quality-grid" id="qualityGrid">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Column Details -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">📋 Column Details</h3>
+                </div>
+                <div class="columns-table-wrapper">
+                    <table class="columns-table" id="columnsTable">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Type</th>
+                                <th>Non-Empty</th>
+                                <th>Missing</th>
+                                <th>Unique Values</th>
+                                <th>Sample</th>
+                            </tr>
+                        </thead>
+                        <tbody id="columnsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">📊 Visual Exploration</h3>
+                </div>
+                <div class="charts-grid" id="chartsGrid">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Key Insights -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">💡 Key Insights</h3>
+                </div>
+                <div class="insights-list" id="insightsList">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Data Preview -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">👀 Data Preview</h3>
+                    <span class="section-sub">First 10 rows</span>
+                </div>
+                <div class="data-preview-wrapper">
+                    <table class="data-table" id="dataTable">
+                        <thead id="dataTableHead"></thead>
+                        <tbody id="dataTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="dash-section next-steps-section">
+                <div class="section-header">
+                    <h3 class="section-title">🚀 What Would You Like To Do Next?</h3>
+                </div>
+                <div class="next-steps-grid">
+                    <button class="next-step-card" id="nextPredict">
+                        <div class="ns-icon">🔮</div>
+                        <h4>Predict Future Values</h4>
+                        <p>Use your data to forecast what might happen next</p>
+                    </button>
+                    <button class="next-step-card" id="nextFactors">
+                        <div class="ns-icon">🎯</div>
+                        <h4>Find Important Factors</h4>
+                        <p>Discover which columns have the biggest impact</p>
+                    </button>
+                    <button class="next-step-card" id="nextGroup">
+                        <div class="ns-icon">🗂️</div>
+                        <h4>Group Similar Records</h4>
+                        <p>Automatically organize data into natural groups</p>
+                    </button>
+                    <button class="next-step-card" id="nextReport">
+                        <div class="ns-icon">📄</div>
+                        <h4>Generate Full Report</h4>
+                        <p>Get a complete summary you can share with your team</p>
+                    </button>
+                </div>
+            </div>
+            <!-- Security Dashboard -->
+            <div class="dash-section security-section">
+                <div class="section-header">
+                    <h3 class="section-title">🛡️ Security & Guardrails</h3>
+                    <span class="section-badge" id="securityBadge">Protected</span>
+                </div>
+                <div class="security-info">
+                    <p class="security-desc">Your data is protected by <strong>NeMo-inspired Guardrails</strong>. All
+                        uploads are scanned for threats, injections, and privacy issues.</p>
+                    <div class="security-grid" id="securityGrid">
+                        <div class="sec-card">
+                            <div class="sec-card-icon">🔒</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">Input Sanitization</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="sec-card">
+                            <div class="sec-card-icon">🛡️</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">Injection Protection</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="sec-card">
+                            <div class="sec-card-icon">🔍</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">PII Detection</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="sec-card">
+                            <div class="sec-card-icon">⚡</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">Rate Limiting</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="sec-card">
+                            <div class="sec-card-icon">🤖</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">Prompt Guard</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="sec-card">
+                            <div class="sec-card-icon">📤</div>
+                            <div class="sec-card-info">
+                                <span class="sec-card-label">Output Filtering</span>
+                                <span class="sec-card-status active">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-log-area">
+                        <h4 class="sec-log-title">Recent Security Events</h4>
+                        <div class="sec-log" id="securityLogList">
+                            <div class="sec-log-empty">✅ No security events — everything is safe.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Chat Assistant -->
+        <div class="chat-fab" id="chatFab" title="Chat with DataMind AI">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+        </div>
+
+        <div class="chat-panel hidden" id="chatPanel">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-avatar">🧠</div>
+                    <div>
+                        <h4 class="chat-name">DataMind AI</h4>
+                        <span class="chat-status-text">Protected by Guardrails</span>
+                    </div>
+                </div>
+                <button class="chat-close" id="chatClose">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-msg bot">
+                    <div class="chat-msg-avatar">🧠</div>
+                    <div class="chat-msg-bubble">
+                        Hi! I'm DataMind AI, your data analysis assistant. I'm protected by <strong>NeMo
+                            Guardrails</strong> to keep our conversation safe and on-topic. How can I help you with your
+                        data?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="chat-guardrail-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    Guardrails Active
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your data..."
+                        maxlength="2000" autocomplete="off">
+                    <button class="chat-send" id="chatSend">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22,2 15,22 11,13 2,9" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast notification -->
+        <div class="toast hidden" id="toast">
+            <span class="toast-icon">✅</span>
+            <span class="toast-text" id="toastText"></span>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built with ❤️ — DataMind AI Agent &copy; 2026</p>
+    </footer>
+
+    <script src="js/guardrails.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
