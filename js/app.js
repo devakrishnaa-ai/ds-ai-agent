@@ -33,76 +33,123 @@ document.addEventListener('DOMContentLoaded', () => {
     setupShield();
 });
 
-// ==================== 3D BACKGROUND (THREE.JS) ====================
-let scene, camera, renderer, points;
+// ==================== 3D BACKGROUND (THREE.JS) — NEW DESIGN MOTION ====================
+let scene, camera, renderer, particles, connections;
 
 function init3DBackground() {
     const container = $('bgParticles');
     if (!container) return;
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.z = 400;
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3000);
+    camera.position.z = 800;
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
 
+    // Particle Configuration
+    const particleCount = 200;
     const geometry = new THREE.BufferGeometry();
-    const vertices = [];
-    const colors = [];
-    const colorOptions = [new THREE.Color(0x8a4bff), new THREE.Color(0x00d2ff), new THREE.Color(0xffcf52)];
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
 
-    for (let i = 0; i < 1500; i++) {
-        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
-        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
-        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
+    const color1 = new THREE.Color(0x9f66ff); // Amethyst
+    const color2 = new THREE.Color(0x00e5ff); // Cyan
+    const color3 = new THREE.Color(0xff3e8d); // Rose
 
-        const col = colorOptions[Math.floor(Math.random() * colorOptions.length)];
-        colors.push(col.r, col.g, col.b);
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+
+        velocities[i * 3] = (Math.random() - 0.5) * 1.5;
+        velocities[i * 3 + 1] = (Math.random() - 0.5) * 1.5;
+        velocities[i * 3 + 2] = (Math.random() - 0.5) * 1.5;
+
+        const mix = Math.random();
+        const c = mix < 0.4 ? color1 : mix < 0.8 ? color2 : color3;
+        colors[i * 3] = c.r;
+        colors[i * 3 + 1] = c.g;
+        colors[i * 3 + 2] = c.b;
     }
 
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-        size: 3,
+        size: 4,
         vertexColors: true,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.8,
         sizeAttenuation: true
     });
 
-    points = new THREE.Points(geometry, material);
-    scene.add(points);
+    particles = new THREE.Points(geometry, material);
+    scene.add(particles);
 
-    // Add a subtle grid
-    const gridHelper = new THREE.GridHelper(2000, 50, 0x8a4bff, 0x1e1e32);
-    gridHelper.position.y = -500;
-    gridHelper.rotation.x = Math.PI / 8;
-    gridHelper.material.opacity = 0.2;
-    gridHelper.material.transparent = true;
-    scene.add(gridHelper);
+    // Connections (Lines)
+    const lineGeometry = new THREE.BufferGeometry();
+    const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x9f66ff,
+        transparent: true,
+        opacity: 0.1,
+        blending: THREE.AdditiveBlending
+    });
+    connections = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(connections);
+
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX - window.innerWidth / 2) * 0.5;
+        mouseY = (e.clientY - window.innerHeight / 2) * 0.5;
+    });
 
     function animate() {
         requestAnimationFrame(animate);
-        points.rotation.x += 0.0005;
-        points.rotation.y += 0.0005;
 
-        // Mouse interaction
-        if (window.mouseX) {
-            points.rotation.y += (window.mouseX * 0.05 - points.rotation.y) * 0.05;
-            points.rotation.x += (window.mouseY * 0.05 - points.rotation.x) * 0.05;
+        const posAttr = particles.geometry.attributes.position;
+        const linePositions = [];
+
+        for (let i = 0; i < particleCount; i++) {
+            posAttr.array[i * 3] += velocities[i * 3];
+            posAttr.array[i * 3 + 1] += velocities[i * 3 + 1];
+            posAttr.array[i * 3 + 2] += velocities[i * 3 + 2];
+
+            // Boundary check
+            if (Math.abs(posAttr.array[i * 3]) > 1000) velocities[i * 3] *= -1;
+            if (Math.abs(posAttr.array[i * 3 + 1]) > 1000) velocities[i * 3 + 1] *= -1;
+            if (Math.abs(posAttr.array[i * 3 + 2]) > 1000) velocities[i * 3 + 2] *= -1;
+
+            // Connection logic
+            for (let j = i + 1; j < particleCount; j++) {
+                const dx = posAttr.array[i * 3] - posAttr.array[j * 3];
+                const dy = posAttr.array[i * 3 + 1] - posAttr.array[j * 3 + 1];
+                const dz = posAttr.array[i * 3 + 2] - posAttr.array[j * 3 + 2];
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                if (dist < 200) {
+                    linePositions.push(
+                        posAttr.array[i * 3], posAttr.array[i * 3 + 1], posAttr.array[i * 3 + 2],
+                        posAttr.array[j * 3], posAttr.array[j * 3 + 1], posAttr.array[j * 3 + 2]
+                    );
+                }
+            }
         }
+
+        posAttr.needsUpdate = true;
+
+        connections.geometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+        connections.geometry.attributes.position.needsUpdate = true;
+
+        camera.position.x += (mouseX - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
 
         renderer.render(scene, camera);
     }
-
-    window.addEventListener('mousemove', (e) => {
-        window.mouseX = (e.clientX / window.innerWidth) - 0.5;
-        window.mouseY = (e.clientY / window.innerHeight) - 0.5;
-    });
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -697,17 +744,17 @@ function render3DViz() {
     const geometry = new THREE.IcosahedronGeometry(1.5, Math.floor(complexity / 5));
 
     const material = new THREE.MeshPhongMaterial({
-        color: 0x864aff,
+        color: 0x9f66ff,
         wireframe: true,
         transparent: true,
         opacity: 0.8,
-        emissive: 0x221144,
+        emissive: 0x110033,
     });
 
     viz3dMesh = new THREE.Mesh(geometry, material);
     viz3dScene.add(viz3dMesh);
 
-    const light = new THREE.PointLight(0x00d2ff, 2, 100);
+    const light = new THREE.PointLight(0x00e5ff, 2, 100);
     light.position.set(5, 5, 5);
     viz3dScene.add(light);
 
@@ -742,17 +789,17 @@ function renderCharts(stats) {
     const catCols = columnMeta.filter(c => c.type === 'category');
 
     const colors = [
-        'rgba(138, 75, 255, 0.8)', // Amethyst
-        'rgba(0, 210, 255, 0.8)',   // Cyan
-        'rgba(255, 62, 141, 0.8)',  // Rose
-        'rgba(255, 207, 82, 0.8)',  // Gold
-        'rgba(0, 255, 136, 0.8)',   // Green
-        'rgba(0, 100, 255, 0.8)',   // Blue
-        'rgba(255, 140, 0, 0.8)',   // Orange
-        'rgba(150, 150, 255, 0.8)'  // Peri
+        'rgba(159, 102, 255, 0.85)', // Vibrant Amethyst
+        'rgba(0, 229, 255, 0.85)',   // Electric Cyan
+        'rgba(255, 62, 141, 0.85)',  // Neon Rose
+        'rgba(255, 207, 82, 0.85)',  // Stellar Gold
+        'rgba(0, 255, 162, 0.85)',   // Matrix Green
+        'rgba(62, 133, 255, 0.85)',  // Bright Blue
+        'rgba(255, 127, 17, 0.85)',  // Vivid Orange
+        'rgba(182, 102, 255, 0.85)'  // Purple
     ];
 
-    const borderColors = colors.map(c => c.replace('0.8', '1'));
+    const borderColors = colors.map(c => c.replace('0.85', '1'));
 
     // Bar chart for top category columns
     catCols.slice(0, 2).forEach(col => {
@@ -773,8 +820,8 @@ function renderCharts(stats) {
                     data,
                     backgroundColor: colors.slice(0, data.length),
                     borderColor: borderColors.slice(0, data.length),
-                    borderWidth: 1,
-                    borderRadius: 6
+                    borderWidth: 1.5,
+                    borderRadius: 8
                 }]
             },
             options: chartOptions('Count')
@@ -801,8 +848,8 @@ function renderCharts(stats) {
                     datasets: [{
                         data,
                         backgroundColor: colors.slice(0, data.length),
-                        borderColor: 'rgba(10, 10, 26, 0.8)',
-                        borderWidth: 3
+                        borderColor: '#000000',
+                        borderWidth: 4
                     }]
                 },
                 options: {
@@ -810,8 +857,8 @@ function renderCharts(stats) {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: { color: '#9595b5', padding: 12, font: { size: 11, family: 'Inter' } }
+                            position: 'right',
+                            labels: { color: '#ffffff', padding: 15, font: { size: 12, family: 'Inter' } }
                         }
                     }
                 }
@@ -837,9 +884,9 @@ function renderCharts(stats) {
                 datasets: [{
                     label: 'Frequency',
                     data: bins.counts,
-                    backgroundColor: idx === 0 ? 'rgba(255, 127, 17, 0.6)' : 'rgba(172, 191, 164, 0.6)',
-                    borderColor: idx === 0 ? 'rgba(255, 127, 17, 1)' : 'rgba(172, 191, 164, 1)',
-                    borderWidth: 1,
+                    backgroundColor: idx === 0 ? 'rgba(159, 102, 255, 0.6)' : 'rgba(0, 229, 255, 0.6)',
+                    borderColor: idx === 0 ? 'rgba(159, 102, 255, 1)' : 'rgba(0, 229, 255, 1)',
+                    borderWidth: 1.5,
                     borderRadius: 4
                 }]
             },
@@ -866,11 +913,11 @@ function renderCharts(stats) {
                     datasets: [{
                         label: `${topCorr.col1} vs ${topCorr.col2}`,
                         data: pairs,
-                        backgroundColor: 'rgba(255, 127, 17, 0.4)',
-                        borderColor: 'rgba(255, 127, 17, 0.8)',
+                        backgroundColor: 'rgba(255, 62, 141, 0.6)',
+                        borderColor: 'rgba(255, 62, 141, 1)',
                         borderWidth: 1,
-                        pointRadius: 3,
-                        pointHoverRadius: 6
+                        pointRadius: 4,
+                        pointHoverRadius: 8
                     }]
                 },
                 options: {
@@ -878,19 +925,19 @@ function renderCharts(stats) {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            labels: { color: '#9595b5', font: { size: 11, family: 'Inter' } }
+                            labels: { color: '#ffffff', font: { size: 12, family: 'Inter' } }
                         }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: topCorr.col1, color: '#9595b5', font: { size: 11, family: 'Inter' } },
-                            ticks: { color: '#5a5a80', font: { size: 10, family: 'Inter' } },
-                            grid: { color: 'rgba(255,255,255,0.04)' }
+                            title: { display: true, text: topCorr.col1, color: '#ffffff', font: { size: 12, family: 'Inter' } },
+                            ticks: { color: '#888888', font: { size: 10, family: 'Inter' } },
+                            grid: { color: 'rgba(255,255,255,0.08)' }
                         },
                         y: {
-                            title: { display: true, text: topCorr.col2, color: '#9595b5', font: { size: 11, family: 'Inter' } },
-                            ticks: { color: '#5a5a80', font: { size: 10, family: 'Inter' } },
-                            grid: { color: 'rgba(255,255,255,0.04)' }
+                            title: { display: true, text: topCorr.col2, color: '#ffffff', font: { size: 12, family: 'Inter' } },
+                            ticks: { color: '#888888', font: { size: 10, family: 'Inter' } },
+                            grid: { color: 'rgba(255,255,255,0.08)' }
                         }
                     }
                 }
@@ -931,14 +978,14 @@ function renderCharts(stats) {
                     datasets: [{
                         label: targetNumCol.name,
                         data,
-                        borderColor: '#FAB12F',
-                        backgroundColor: 'rgba(250, 177, 47, 0.1)',
+                        borderColor: '#00e5ff',
+                        backgroundColor: 'rgba(0, 229, 255, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 7,
-                        pointBackgroundColor: '#FAB12F',
-                        borderWidth: 2.5
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#00e5ff',
+                        borderWidth: 3
                     }]
                 },
                 options: chartOptions(targetNumCol.name)
@@ -962,18 +1009,18 @@ function chartOptions(yLabel) {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                labels: { color: '#9595b5', font: { size: 11, family: 'Inter' } }
+                labels: { color: '#ffffff', font: { size: 12, family: 'Inter' } }
             }
         },
         scales: {
             x: {
-                ticks: { color: '#5a5a80', font: { size: 10, family: 'Inter' }, maxRotation: 45 },
-                grid: { color: 'rgba(255,255,255,0.04)' }
+                ticks: { color: '#888888', font: { size: 10, family: 'Inter' }, maxRotation: 45 },
+                grid: { color: 'rgba(255,255,255,0.08)' }
             },
             y: {
-                title: { display: true, text: yLabel, color: '#9595b5', font: { size: 11, family: 'Inter' } },
-                ticks: { color: '#5a5a80', font: { size: 10, family: 'Inter' } },
-                grid: { color: 'rgba(255,255,255,0.04)' }
+                title: { display: true, text: yLabel, color: '#ffffff', font: { size: 12, family: 'Inter' } },
+                ticks: { color: '#888888', font: { size: 10, family: 'Inter' } },
+                grid: { color: 'rgba(255,255,255,0.08)' }
             }
         }
     };

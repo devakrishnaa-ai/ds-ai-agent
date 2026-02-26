@@ -3,44 +3,45 @@
    ============================================= */
 
 :root {
-    /* Cyber-Luxe Palette — Premium & Pro */
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121e;
-    --bg-card: rgba(22, 22, 38, 0.7);
-    --bg-card-hover: rgba(138, 75, 255, 0.05);
-    --bg-glass: rgba(30, 30, 50, 0.4);
-    --bg-glass-hover: rgba(40, 40, 70, 0.6);
+    /* Obsidian Dark Palette — Complete Black & Premium */
+    --bg-primary: #000000;
+    --bg-secondary: #050505;
+    --bg-card: rgba(12, 12, 12, 0.85);
+    --bg-card-hover: rgba(20, 20, 20, 0.95);
+    --bg-glass: rgba(10, 10, 10, 0.6);
+    --bg-glass-hover: rgba(20, 20, 20, 0.8);
 
-    --text-primary: #f0f0f5;
-    --text-secondary: #b0b0c5;
-    --text-muted: #787895;
+    --text-primary: #ffffff;
+    --text-secondary: #d1d1d1;
+    --text-muted: #888888;
 
-    --accent-1: #8a4bff;
-    /* Electric Amethyst */
-    --accent-2: #00d2ff;
-    /* Cyber Cyan */
+    --accent-1: #9f66ff;
+    /* Vibrant Amethyst */
+    --accent-2: #00e5ff;
+    /* Electric Cyan */
     --accent-3: #ffcf52;
     /* Stellar Gold */
     --accent-4: #ff3e8d;
     /* Neon Rose */
-    --accent-5: #00ff88;
+    --accent-5: #00ffa2;
     /* Matrix Green */
-    --accent-6: #708A6B;
-    /* Muted Sage (retained for some variety) */
+    --accent-6: #8e9aaf;
+    /* Cool Slate */
 
-    --gradient-main: linear-gradient(135deg, #8a4bff 0%, #00d2ff 100%);
-    --gradient-premium: linear-gradient(135deg, #8a4bff 0%, #ff3e8d 100%);
+    --gradient-main: linear-gradient(135deg, #9f66ff 0%, #00e5ff 100%);
+    --gradient-premium: linear-gradient(135deg, #9f66ff 0%, #ff3e8d 100%);
     --gradient-gold: linear-gradient(135deg, #ffcf52 0%, #ff8c00 100%);
+    --gradient-dark: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
 
-    --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+    --border-glass: 1px solid rgba(255, 255, 255, 0.1);
     --border-subtle: rgba(255, 255, 255, 0.05);
-    --border-accent: rgba(138, 75, 255, 0.3);
+    --border-accent: rgba(159, 102, 255, 0.4);
 
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8);
-    --shadow-glow: 0 0 30px rgba(138, 75, 255, 0.2);
-    --shadow-cyan: 0 0 40px rgba(0, 210, 255, 0.15);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 1);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 1);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 1);
+    --shadow-glow: 0 0 30px rgba(159, 102, 255, 0.25);
+    --shadow-cyan: 0 0 40px rgba(0, 229, 255, 0.2);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -139,11 +140,11 @@ h6,
     z-index: 100;
     padding: 0 24px;
     height: 70px;
-    background: rgba(10, 10, 15, 0.8);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
     border-bottom: var(--border-glass);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 .header-inner {
@@ -628,8 +629,8 @@ h6,
 }
 
 .dash-section:hover {
-    border-color: rgba(221, 3, 3, 0.2);
-    box-shadow: var(--shadow-md);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-glow);
 }
 
 .section-header {
@@ -1770,19 +1771,19 @@ h6,
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(221, 3, 3, 0.3);
-    border-radius: 3px;
+    background: rgba(159, 102, 255, 0.3);
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(221, 3, 3, 0.5);
+    background: rgba(159, 102, 255, 0.5);
 }
