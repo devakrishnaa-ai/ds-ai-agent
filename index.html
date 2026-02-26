@@ -48,9 +48,9 @@
 
                         <defs>
                             <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
-                                <stop offset="0%" stop-color="#FAB12F" />
-                                <stop offset="50%" stop-color="#FA812F" />
-                                <stop offset="100%" stop-color="#DD0303" />
+                                <stop offset="0%" stop-color="#FF7F11" />
+                                <stop offset="50%" stop-color="#ACBFA4" />
+                                <stop offset="100%" stop-color="#262626" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -105,8 +105,8 @@
                                     stroke-linecap="round" stroke-linejoin="round" />
                                 <defs>
                                     <linearGradient id="upGrad" x1="8" y1="8" x2="56" y2="56">
-                                        <stop offset="0%" stop-color="#FAB12F" />
-                                        <stop offset="100%" stop-color="#FA812F" />
+                                        <stop offset="0%" stop-color="#FF7F11" />
+                                        <stop offset="100%" stop-color="#FF9F1C" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -182,7 +182,7 @@
             <!-- Data Overview Cards -->
             <div class="overview-cards" id="overviewCards">
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(250, 177, 47, 0.15); color: var(--accent-1);">
+                    <div class="ov-card-icon" style="background: rgba(255, 127, 17, 0.15); color: var(--accent-1);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -197,7 +197,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(250, 129, 47, 0.15); color: var(--accent-2);">
+                    <div class="ov-card-icon" style="background: rgba(172, 191, 164, 0.15); color: var(--accent-6);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <rect x="3" y="3" width="7" height="7" />
@@ -212,7 +212,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(76, 175, 80, 0.15); color: var(--accent-3);">
+                    <div class="ov-card-icon" style="background: rgba(38, 38, 38, 0.1); color: var(--accent-3);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
@@ -224,7 +224,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(221, 3, 3, 0.15); color: var(--accent-4);">
+                    <div class="ov-card-icon" style="background: rgba(230, 106, 0, 0.15); color: var(--accent-4);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -448,6 +448,29 @@
                             <polygon points="22,2 15,22 11,13 2,9" />
                         </svg>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Analysis Results (Modal) -->
+        <div class="analysis-modal hidden" id="analysisModal">
+            <div class="modal-overlay" id="modalOverlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Advanced Analysis</h3>
+                    <button class="modal-close" id="modalClose">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Content injected by JS -->
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn-primary" id="modalActionBtn">Got it!</button>
                 </div>
             </div>
         </div>
