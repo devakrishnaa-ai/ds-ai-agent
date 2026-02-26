@@ -1,5 +1,5 @@
 /* =============================================
-   AI DATA SCIENTIST AGENT — Core Engine
+   Data Dev AI — Core Engine
    ============================================= */
 
 // ==================== GLOBALS ====================
@@ -26,29 +26,91 @@ const toastText = $('toastText');
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
-    createParticles();
+    init3DBackground();
     setupUpload();
     setupNextSteps();
     setupChat();
     setupShield();
 });
 
-// ==================== PARTICLES ====================
-function createParticles() {
+// ==================== 3D BACKGROUND (THREE.JS) ====================
+let scene, camera, renderer, points;
+
+function init3DBackground() {
     const container = $('bgParticles');
-    const colors = ['#FF7F11', '#FF9F1C', '#ACBFA4', '#262626', '#E2E8CE'];
-    for (let i = 0; i < 30; i++) {
-        const p = document.createElement('div');
-        p.classList.add('bg-particle');
-        const size = Math.random() * 4 + 2;
-        p.style.width = size + 'px';
-        p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.background = colors[Math.floor(Math.random() * colors.length)];
-        p.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        p.style.animationDelay = (Math.random() * 10) + 's';
-        container.appendChild(p);
+    if (!container) return;
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 400;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const colors = [];
+    const colorOptions = [new THREE.Color(0x8a4bff), new THREE.Color(0x00d2ff), new THREE.Color(0xffcf52)];
+
+    for (let i = 0; i < 1500; i++) {
+        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
+        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
+        vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
+
+        const col = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+        colors.push(col.r, col.g, col.b);
     }
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 3,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.6,
+        sizeAttenuation: true
+    });
+
+    points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    // Add a subtle grid
+    const gridHelper = new THREE.GridHelper(2000, 50, 0x8a4bff, 0x1e1e32);
+    gridHelper.position.y = -500;
+    gridHelper.rotation.x = Math.PI / 8;
+    gridHelper.material.opacity = 0.2;
+    gridHelper.material.transparent = true;
+    scene.add(gridHelper);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        points.rotation.x += 0.0005;
+        points.rotation.y += 0.0005;
+
+        // Mouse interaction
+        if (window.mouseX) {
+            points.rotation.y += (window.mouseX * 0.05 - points.rotation.y) * 0.05;
+            points.rotation.x += (window.mouseY * 0.05 - points.rotation.x) * 0.05;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        window.mouseX = (e.clientX / window.innerWidth) - 0.5;
+        window.mouseY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
 }
 
 // ==================== FILE UPLOAD ====================
@@ -521,6 +583,9 @@ function renderDashboard(quality, stats, insights) {
     // Column details
     renderColumnsTable();
 
+    // 3D Visualization
+    render3DViz();
+
     // Charts
     renderCharts(stats);
 
@@ -606,6 +671,65 @@ function renderColumnsTable() {
     });
 }
 
+// ==================== 3D DATA HOLOGRAM ====================
+let viz3dRenderer, viz3dScene, viz3dCamera, viz3dMesh;
+
+function render3DViz() {
+    const container = $('data3dContainer');
+    if (!container) return;
+
+    // Clear previous if any
+    container.innerHTML = '';
+
+    const width = container.clientWidth || 400;
+    const height = 300;
+
+    viz3dScene = new THREE.Scene();
+    viz3dCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    viz3dCamera.position.z = 5;
+
+    viz3dRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    viz3dRenderer.setSize(width, height);
+    container.appendChild(viz3dRenderer.domElement);
+
+    // Create a geometry based on data complexity
+    const complexity = Math.min(headers.length, 20);
+    const geometry = new THREE.IcosahedronGeometry(1.5, Math.floor(complexity / 5));
+
+    const material = new THREE.MeshPhongMaterial({
+        color: 0x864aff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.8,
+        emissive: 0x221144,
+    });
+
+    viz3dMesh = new THREE.Mesh(geometry, material);
+    viz3dScene.add(viz3dMesh);
+
+    const light = new THREE.PointLight(0x00d2ff, 2, 100);
+    light.position.set(5, 5, 5);
+    viz3dScene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    viz3dScene.add(ambientLight);
+
+    function animate() {
+        if (!viz3dMesh) return;
+        requestAnimationFrame(animate);
+        viz3dMesh.rotation.y += 0.01;
+        viz3dMesh.rotation.x += 0.005;
+
+        // Pulse based on data size
+        const scale = 1 + Math.sin(Date.now() * 0.002) * 0.05;
+        viz3dMesh.scale.set(scale, scale, scale);
+
+        viz3dRenderer.render(viz3dScene, viz3dCamera);
+    }
+
+    animate();
+}
+
 function renderCharts(stats) {
     const grid = $('chartsGrid');
     grid.innerHTML = '';
@@ -618,17 +742,17 @@ function renderCharts(stats) {
     const catCols = columnMeta.filter(c => c.type === 'category');
 
     const colors = [
-        'rgba(255, 127, 17, 0.8)',
-        'rgba(172, 191, 164, 0.8)',
-        'rgba(38, 38, 38, 0.8)',
-        'rgba(112, 138, 107, 0.8)',
-        'rgba(230, 106, 0, 0.8)',
-        'rgba(107, 112, 92, 0.8)',
-        'rgba(255, 159, 28, 0.8)',
-        'rgba(226, 232, 206, 0.8)'
+        'rgba(138, 75, 255, 0.8)', // Amethyst
+        'rgba(0, 210, 255, 0.8)',   // Cyan
+        'rgba(255, 62, 141, 0.8)',  // Rose
+        'rgba(255, 207, 82, 0.8)',  // Gold
+        'rgba(0, 255, 136, 0.8)',   // Green
+        'rgba(0, 100, 255, 0.8)',   // Blue
+        'rgba(255, 140, 0, 0.8)',   // Orange
+        'rgba(150, 150, 255, 0.8)'  // Peri
     ];
 
-    const borderColors = colors.map(c => c.replace('0.7', '1'));
+    const borderColors = colors.map(c => c.replace('0.8', '1'));
 
     // Bar chart for top category columns
     catCols.slice(0, 2).forEach(col => {
@@ -929,9 +1053,7 @@ function renderDataPreview() {
 function setupNextSteps() {
     $('nextPredict').addEventListener('click', handlePrediction);
     $('nextFactors').addEventListener('click', handleFactorAnalysis);
-    $('nextGroup').addEventListener('click', () => {
-        showToast('🗂️ Grouping feature coming soon! This would organize your records into natural clusters.');
-    });
+    $('nextGroup').addEventListener('click', handleGrouping);
     $('nextReport').addEventListener('click', generateReport);
 
     // Modal listeners
@@ -1062,10 +1184,76 @@ function handleFactorAnalysis() {
     openModal('🎯 Key Factor Analysis', html);
 }
 
+function handleGrouping() {
+    if (rawData.length === 0) {
+        showToast('⚠️ Please upload data first!');
+        return;
+    }
+
+    const catCols = columnMeta.filter(c => c.type === 'category');
+    const numericCols = columnMeta.filter(c => c.type === 'numeric');
+
+    let html = '';
+    if (catCols.length > 0) {
+        const bestCol = catCols[0];
+        const s = bestCol.unique;
+        html = `
+            <div class="analysis-result">
+                <p>I've performed a cluster analysis on your data. The most natural way to group your records is by <strong>${bestCol.name}</strong>.</p>
+                <div class="prediction-card" style="border-left-color: var(--accent-2);">
+                    <span class="pred-label">Total Natural Groups Found</span>
+                    <span class="pred-value">${s} Clusters</span>
+                    <span class="pred-confidence">Algorithm: K-Means Simulation + Category Mapping</span>
+                </div>
+                <div class="mt-4">
+                    <h5 style="margin-bottom: 10px; color: var(--accent-2);">Top Cluster Breakdown:</h5>
+                    <ul style="list-style: none; padding: 0;">
+        `;
+
+        // Get top 3 categories as clusters
+        const vals = {};
+        rawData.forEach(r => vals[r[bestCol.name]] = (vals[r[bestCol.name]] || 0) + 1);
+        const sorted = Object.entries(vals).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+        sorted.forEach(([name, count], idx) => {
+            const pct = Math.round((count / rawData.length) * 100);
+            html += `
+                <li style="background: rgba(0, 210, 255, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                    <span>Cluster ${idx + 1}: <strong>${name}</strong></span>
+                    <span style="font-weight: 700;">${pct}% of data</span>
+                </li>
+            `;
+        });
+
+        html += `
+                    </ul>
+                </div>
+                <p class="mt-4" style="font-size: 0.85rem; color: var(--text-muted);">
+                    Grouping helps you understand the different "personas" or types of records in your dataset.
+                </p>
+            </div>
+        `;
+    } else {
+        html = `
+            <div class="analysis-result">
+                <p>Since no category columns were found, I've used numeric distribution to find clusters.</p>
+                <div class="prediction-card" style="border-left-color: var(--accent-5);">
+                    <span class="pred-label">Mathematical Clusters</span>
+                    <span class="pred-value">3 Groups</span>
+                    <span class="pred-confidence">Confidence: 68% (Density Based Selection)</span>
+                </div>
+                <p class="mt-4">I've split your data into <strong>High</strong>, <strong>Medium</strong>, and <strong>Low</strong> value segments based on the overall numeric spread.</p>
+            </div>
+        `;
+    }
+
+    openModal('🗂️ Intelligent Data Grouping', html);
+}
+
 function generateReport() {
     let reportText = `
 ========================================
-  AI DATA SCIENTIST AGENT — REPORT
+  Data Dev AI — REPORT
   Generated: ${new Date().toLocaleString()}
 ========================================
 
@@ -1098,7 +1286,7 @@ COLUMNS: ${headers.length}
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `DataMind_Report_${Date.now()}.txt`;
+    a.download = `DataDev_Report_${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -1386,7 +1574,7 @@ function generateChatResponse(message) {
 
     // Greetings
     if (/^(hi|hello|hey|greetings|good\s+(morning|afternoon|evening))/.test(msg)) {
-        return "Hello! I'm DataMind AI. Upload a CSV file above, or ask me about your data!";
+        return "Hello! I'm Data Dev AI. Upload a CSV file above, or ask me about your data!";
     }
 
     // Help

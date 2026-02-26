@@ -4,15 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Data Scientist Agent — Your Smart Data Assistant</title>
+    <title>Data Dev AI — Your Smart Data Assistant</title>
     <meta name="description"
-        content="Upload your data and let our AI Data Scientist Agent analyze it automatically. No coding or technical knowledge required.">
+        content="Upload your data and let our Data Dev AI analyze it automatically. No coding or technical knowledge required.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -48,14 +50,13 @@
 
                         <defs>
                             <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
-                                <stop offset="0%" stop-color="#FF7F11" />
-                                <stop offset="50%" stop-color="#ACBFA4" />
-                                <stop offset="100%" stop-color="#262626" />
+                                <stop offset="0%" stop-color="#8a4bff" />
+                                <stop offset="100%" stop-color="#00d2ff" />
                             </linearGradient>
                         </defs>
                     </svg>
                 </div>
-                <span class="logo-text">DataMind <span class="logo-ai">AI</span></span>
+                <span class="logo-text">Data Dev <span class="logo-ai">AI</span></span>
             </div>
             <div class="header-right">
                 <button class="shield-btn" id="shieldBtn" title="Security Status">
@@ -105,8 +106,8 @@
                                     stroke-linecap="round" stroke-linejoin="round" />
                                 <defs>
                                     <linearGradient id="upGrad" x1="8" y1="8" x2="56" y2="56">
-                                        <stop offset="0%" stop-color="#FF7F11" />
-                                        <stop offset="100%" stop-color="#FF9F1C" />
+                                        <stop offset="0%" stop-color="#8a4bff" />
+                                        <stop offset="100%" stop-color="#00d2ff" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -182,7 +183,7 @@
             <!-- Data Overview Cards -->
             <div class="overview-cards" id="overviewCards">
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(255, 127, 17, 0.15); color: var(--accent-1);">
+                    <div class="ov-card-icon" style="background: rgba(138, 75, 255, 0.15); color: var(--accent-1);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -197,7 +198,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(172, 191, 164, 0.15); color: var(--accent-6);">
+                    <div class="ov-card-icon" style="background: rgba(0, 210, 255, 0.15); color: var(--accent-2);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <rect x="3" y="3" width="7" height="7" />
@@ -212,7 +213,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(38, 38, 38, 0.1); color: var(--accent-3);">
+                    <div class="ov-card-icon" style="background: rgba(255, 207, 82, 0.15); color: var(--accent-3);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
@@ -224,7 +225,7 @@
                     </div>
                 </div>
                 <div class="ov-card">
-                    <div class="ov-card-icon" style="background: rgba(230, 106, 0, 0.15); color: var(--accent-4);">
+                    <div class="ov-card-icon" style="background: rgba(255, 62, 141, 0.15); color: var(--accent-4);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -269,6 +270,23 @@
                         <tbody id="columnsBody">
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- 3D Visualization Section -->
+            <div class="dash-section">
+                <div class="section-header">
+                    <h3 class="section-title">🔮 3D Data Hologram</h3>
+                    <span class="section-badge">Experimental</span>
+                </div>
+                <div class="viz-3d-wrapper" id="viz3dWrapper">
+                    <!-- Three.js Canvas injected here -->
+                    <div id="data3dContainer"></div>
+                    <div class="viz-3d-info">
+                        <h4>Interactive Data Structure</h4>
+                        <p>This 3D model represents the neural connectivity and distribution of your dataset. Rotates
+                            based on data complexity.</p>
+                    </div>
                 </div>
             </div>
 
@@ -409,7 +427,7 @@
                 <div class="chat-header-left">
                     <div class="chat-avatar">🧠</div>
                     <div>
-                        <h4 class="chat-name">DataMind AI</h4>
+                        <h4 class="chat-name">Data Dev AI</h4>
                         <span class="chat-status-text">Protected by Guardrails</span>
                     </div>
                 </div>
@@ -424,7 +442,7 @@
                 <div class="chat-msg bot">
                     <div class="chat-msg-avatar">🧠</div>
                     <div class="chat-msg-bubble">
-                        Hi! I'm DataMind AI, your data analysis assistant. I'm protected by <strong>NeMo
+                        Hi! I'm Data Dev AI, your data analysis assistant. I'm protected by <strong>NeMo
                             Guardrails</strong> to keep our conversation safe and on-topic. How can I help you with your
                         data?
                     </div>
@@ -484,7 +502,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>Built with ❤️ — DataMind AI Agent &copy; 2026</p>
+        <p>Built with ❤️ — Data Dev AI &copy; 2026</p>
     </footer>
 
     <script src="js/guardrails.js"></script>

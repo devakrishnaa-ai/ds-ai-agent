@@ -1,6 +1,6 @@
 """
 =============================================
- AI Data Scientist Agent — Backend Server
+ Data Dev AI — Backend Server
  Protected by NVIDIA NeMo Guardrails
 =============================================
 
@@ -40,8 +40,8 @@ except ImportError:
 
 # ==================== App Setup ====================
 app = FastAPI(
-    title="DataMind AI — Guardrailed Backend",
-    description="AI Data Scientist Agent backend protected by NeMo Guardrails",
+    title="Data Dev AI — Guardrailed Backend",
+    description="Data Dev AI backend protected by NeMo Guardrails",
     version="1.0.0"
 )
 
@@ -168,7 +168,7 @@ def fallback_check_input(message: str) -> tuple[bool, str]:
     for pattern in INJECTION_PATTERNS:
         if pattern.search(message):
             log_security_event("PROMPT_INJECTION", "critical", "Prompt injection blocked", {"message": message[:200]})
-            return False, "I'm DataMind AI, your data analysis assistant. I can't change my role or ignore my guidelines."
+            return False, "I'm Data Dev AI, your data analysis assistant. I can't change my role or ignore my guidelines."
     
     for pattern in HARMFUL_PATTERNS:
         if pattern.search(message):
@@ -188,7 +188,7 @@ async def startup():
 async def root():
     """Health check endpoint."""
     return {
-        "service": "DataMind AI — Guardrailed Backend",
+        "service": "Data Dev AI — Guardrailed Backend",
         "status": "running",
         "guardrails_active": rails is not None,
         "guardrails_library": GUARDRAILS_AVAILABLE,
@@ -310,7 +310,7 @@ def generate_fallback_response(message: str) -> str:
     message_lower = message.lower()
     
     if any(w in message_lower for w in ["hi", "hello", "hey", "greetings"]):
-        return "Hello! I'm DataMind AI, your data analysis assistant. Upload a CSV file to get started, or ask me anything about data analysis!"
+        return "Hello! I'm Data Dev AI, your data analysis assistant. Upload a CSV file to get started, or ask me anything about data analysis!"
     
     if any(w in message_lower for w in ["help", "what can you", "how do", "capabilities"]):
         return ("I can help you with:\n"
@@ -344,7 +344,7 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     
     print("=" * 50)
-    print("  DataMind AI — Guardrailed Backend")
+    print("  Data Dev AI — Guardrailed Backend")
     print("  Protected by NeMo Guardrails")
     print(f"  Running on http://{host}:{port}")
     print("=" * 50)
