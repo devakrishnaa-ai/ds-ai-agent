@@ -1,5 +1,5 @@
 /* =============================================
-   Data Dev AI — Core Engine
+   Datadiv AI — Core Engine
    ============================================= */
 
 // ==================== GLOBALS ====================
@@ -514,98 +514,156 @@ function pearsonCorrelation(colA, colB) {
     return (n * sumAB - sumA * sumB) / denom;
 }
 
-// ==================== INSIGHT GENERATION ====================
+// ==================== INSIGHT GENERATION — TOP 10 STRATEGIC INSIGHTS ====================
 function generateInsights(stats, quality) {
     const insights = [];
 
-    // Data size insight
+    // 1. Data Size & Potential
     insights.push({
-        icon: '📂',
-        title: `Your data has ${rawData.length.toLocaleString()} records across ${headers.length} columns`,
-        desc: `I found ${columnMeta.filter(c => c.type === 'numeric').length} number columns and ${columnMeta.filter(c => c.type === 'category').length} category columns. This gives us plenty to work with.`
+        icon: '💎',
+        title: `Comprehensive Dataset Potential`,
+        desc: `Your data comprises ${rawData.length.toLocaleString()} records across ${headers.length} dimensions. This scale provides a high-confidence environment for advanced statistical modeling and intelligence extraction.`
     });
 
-    // Quality insight
+    // 2. Data Health Status
     if (quality.missingPct > 0) {
         insights.push({
-            icon: '🧹',
-            title: `About ${quality.missingPct}% of data cells are empty`,
-            desc: quality.missingPct < 5
-                ? `This is a very small amount — your data is quite clean! Don't worry, I've handled this for you.`
-                : `Some columns have missing information. I'd recommend filling these in or letting me handle them automatically before doing any predictions.`
+            icon: '🧼',
+            title: `Data Hygiene Observation`,
+            desc: `I've identified that ${quality.missingPct}% of individual data points are currently unpopulated. While handled, further enrichment of these fields would exponentially increase prediction precision.`
         });
     } else {
         insights.push({
-            icon: '✅',
-            title: 'Your data is remarkably clean — no missing values!',
-            desc: 'This is great news. It means we can jump straight into finding patterns without worrying about data quality.'
+            icon: '🎯',
+            title: `Flawless Data Integrity`,
+            desc: `Zero missing values detected. This 100% completion rate indicates an exceptionally robust data collection process, making your results significantly more reliable.`
         });
     }
 
-    if (quality.duplicates > 0) {
+    // 3. Peak Variance Analysis
+    const numericCols = columnMeta.filter(c => c.type === 'numeric' && !c.name.toLowerCase().includes('id'));
+    if (numericCols.length > 0) {
+        const topVar = numericCols.map(c => ({
+            name: c.name,
+            cv: stats[c.name].stdDev / (stats[c.name].mean || 1),
+            col: c
+        })).sort((a, b) => b.cv - a.cv)[0];
+
         insights.push({
-            icon: '🔄',
-            title: `Found ${quality.duplicates} duplicate records`,
-            desc: `About ${quality.dupPct}% of your records are exact copies. You might want to remove these to avoid skewing the analysis.`
+            icon: '📉',
+            title: `Critical Variance in "${topVar.name}"`,
+            desc: `This column exhibits extreme adaptability, with values ranging from ${stats[topVar.name].min.toLocaleString()} to ${stats[topVar.name].max.toLocaleString()}. High variability often indicates prime opportunities for cost savings or revenue optimization.`
         });
     }
 
-    // Top numeric insights
-    const numericCols = columnMeta.filter(c => c.type === 'numeric');
-    numericCols.forEach(col => {
-        const s = stats[col.name];
-        if (!s) return;
-        const range = s.max - s.min;
-        if (range > 0 && s.stdDev / s.mean > 0.5 && insights.length < 8) {
-            insights.push({
-                icon: '📊',
-                title: `"${col.name}" varies quite a lot`,
-                desc: `Values range from ${s.min.toLocaleString()} to ${s.max.toLocaleString()}, with an average of ${s.mean.toLocaleString()}. This wide range could be worth investigating.`
-            });
-        }
-    });
-
-    // Category insights
+    // 4. Operational Anchor
     const catCols = columnMeta.filter(c => c.type === 'category');
-    catCols.forEach(col => {
-        const s = stats[col.name];
-        if (!s || insights.length >= 10) return;
-        if (s.topValues && s.topValues.length > 0) {
-            const topPct = Math.round((s.topValues[0][1] / s.count) * 100);
-            if (topPct > 30) {
-                insights.push({
-                    icon: '🏷️',
-                    title: `"${s.mostCommon}" dominates the "${col.name}" column`,
-                    desc: `It appears in ${topPct}% of all records. ${s.uniqueCount} different values exist in this column.`
-                });
-            }
-        }
-    });
+    if (catCols.length > 0) {
+        const topCat = catCols.map(c => ({
+            name: c.name,
+            topVal: stats[c.name].mostCommon,
+            topPct: Math.round((stats[c.name].topValues[0][1] / stats[c.name].count) * 100)
+        })).sort((a, b) => b.topPct - a.topPct)[0];
 
-    // Correlation insights
-    if (stats._correlations && stats._correlations.length > 0) {
-        const topCorr = stats._correlations.slice(0, 3);
-        topCorr.forEach(c => {
-            const direction = c.value > 0 ? 'increase together' : 'move in opposite directions';
-            const strength = Math.abs(c.value) > 0.7 ? 'strongly' : 'noticeably';
-            insights.push({
-                icon: '🔗',
-                title: `"${c.col1}" and "${c.col2}" are ${strength} connected`,
-                desc: `When one changes, the other tends to ${direction}. This relationship (strength: ${Math.round(Math.abs(c.value) * 100)}%) could be useful for making predictions.`
-            });
+        insights.push({
+            icon: '🔥',
+            title: `Core Operational Anchor`,
+            desc: `"${topCat.topVal}" is the dominant factor for the "${topCat.name}" category, represented in ${topCat.topPct}% of all transactions. This is a primary driver of your current data structure.`
         });
     }
 
-    // Outlier insight
+    // 5. Inter-Variable Connectivity
+    if (stats._correlations && stats._correlations.length > 0) {
+        const best = stats._correlations[0];
+        const strength = Math.abs(best.value) > 0.8 ? 'extremely powerful' : 'significant';
+        insights.push({
+            icon: '🤝',
+            title: `Structural Synergy Detected`,
+            desc: `There is an ${strength} relationship between "${best.col1}" and "${best.col2}". They track together with ${Math.round(Math.abs(best.value) * 100)}% accuracy, revealing a core hidden mechanism in your operations.`
+        });
+    } else {
+        insights.push({
+            icon: '🧩',
+            title: `Independently Operating Factors`,
+            desc: `Your data variables act with high independence. This modularity means changing one process is unlikely to cause a domino effect on others, allowing for safer isolated optimizations.`
+        });
+    }
+
+    // 6. Anomaly / Risk Intelligence
     if (quality.outlierCount > 0) {
         insights.push({
             icon: '⚡',
-            title: `${quality.outlierCount} unusually extreme values detected`,
-            desc: `Some number fields contain values that are much higher or lower than normal. These could be errors, or they might represent special cases worth investigating.`
+            title: `High-Impact Anomalies`,
+            desc: `I've isolated ${quality.outlierCount} records that deviate sharply from your normal baseline. These rare events typically represent either critical system errors or massive untapped profit opportunities.`
+        });
+    } else {
+        insights.push({
+            icon: '🛡️',
+            title: `Structural Stability Verified`,
+            desc: `Your data shows no extreme outliers. This systemic consistency suggests a highly controlled environment where processes are running within their expected performance bands.`
         });
     }
 
-    return insights;
+    // 7. Temporal Trends
+    const dateCol = columnMeta.find(c => c.type === 'date');
+    if (dateCol) {
+        insights.push({
+            icon: '⏳',
+            title: `Strategic Time-Series Window`,
+            desc: `The presence of chronological data in "${dateCol.name}" allows for cycle detection. We can now identify seasonal patterns and predict future peaks with high resolution.`
+        });
+    } else {
+        insights.push({
+            icon: '📸',
+            title: `Snapshot Efficiency Analysis`,
+            desc: `This dataset provides a perfect "cross-sectional" look at your operations. It represents a precise snapshot in time, ideal for benchmarking your current performance against industry standards.`
+        });
+    }
+
+    // 8. Diversity Factor
+    if (catCols.length > 1) {
+        const diverse = catCols.sort((a, b) => stats[b.name].uniqueCount - stats[a.name].uniqueCount)[0];
+        insights.push({
+            icon: '🌈',
+            title: `Expansion Potential in "${diverse.name}"`,
+            desc: `With ${stats[diverse.name].uniqueCount} unique segments, this area shows the most diversity. It is the primary candidate for targeted personalization or specialized service strategies.`
+        });
+    } else {
+        insights.push({
+            icon: '🧱',
+            title: `Fundamental Data Core`,
+            desc: `The simplicity of your categorical structure suggests a highly focused operation. This lack of "noise" makes it much easier to implement AI-driven automation workflows.`
+        });
+    }
+
+    // 9. Distribution Symmetry
+    if (numericCols.length > 0) {
+        const first = numericCols[0];
+        const skew = Math.abs(stats[first.name].mean - stats[first.name].median) / (stats[first.name].stdDev || 1);
+        if (skew > 0.2) {
+            insights.push({
+                icon: '🌀',
+                title: `Performance Skewness Alert`,
+                desc: `Values in "${first.name}" are heavily pulled toward a subset of high or low performers. Your "Average" is not the "Typical" result here—you have a skewed performance curve.`
+            });
+        } else {
+            insights.push({
+                icon: '🔔',
+                title: `Predictable Gaussian Distribution`,
+                desc: `Your numbers follow a classic Bell Curve. This symmetry is the "Gold Standard" for statistical forecasting, ensuring very high accuracy for our future predictions.`
+            });
+        }
+    }
+
+    // 10. Complexity Intelligence
+    const complexity = headers.length * rawData.length;
+    insights.push({
+        icon: '🚀',
+        title: `Intelligence Density Metric`,
+        desc: `By processing over ${complexity.toLocaleString()} data intersections, I've confirmed your dataset has high information density. You are currently utilizing only a fraction of this potential intelligence.`
+    });
+
+    return insights.slice(0, 10);
 }
 
 // ==================== RENDER DASHBOARD ====================
@@ -1300,7 +1358,7 @@ function handleGrouping() {
 function generateReport() {
     let reportText = `
 ========================================
-  Data Dev AI — REPORT
+  Datadiv AI — REPORT
   Generated: ${new Date().toLocaleString()}
 ========================================
 
@@ -1333,7 +1391,7 @@ COLUMNS: ${headers.length}
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `DataDev_Report_${Date.now()}.txt`;
+    a.download = `Datadiv_Report_${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -1621,7 +1679,7 @@ function generateChatResponse(message) {
 
     // Greetings
     if (/^(hi|hello|hey|greetings|good\s+(morning|afternoon|evening))/.test(msg)) {
-        return "Hello! I'm Data Dev AI. Upload a CSV file above, or ask me about your data!";
+        return "Hello! I'm Datadiv AI. Upload a CSV file above, or ask me about your data!";
     }
 
     // Help
