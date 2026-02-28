@@ -682,6 +682,15 @@ function renderDashboard(quality, stats, insights) {
     $('numericCols').textContent = columnMeta.filter(c => c.type === 'numeric').length;
     $('categoryCols').textContent = columnMeta.filter(c => c.type === 'category').length;
 
+    // New Overview metrics
+    const totalCells = rawData.length * headers.length;
+    const dataDensityVal = totalCells > 0 ? Math.round(((totalCells - quality.totalMissing) / totalCells) * 100) : 0;
+
+    $('fileSize').textContent = formatFileSize(JSON.stringify(rawData).length);
+    $('missingPctCard').textContent = quality.missingPct + '%';
+    $('dataDensity').textContent = dataDensityVal + '%';
+    $('duplicateRows').textContent = quality.duplicates.toLocaleString();
+
     // Quality
     renderQuality(quality);
 
@@ -1469,6 +1478,14 @@ function formatCompact(n) {
     if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(1) + 'M';
     if (Math.abs(n) >= 1000) return (n / 1000).toFixed(1) + 'K';
     return String(Math.round(n * 10) / 10);
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 function pearsonCorrelation(name1, name2) {
