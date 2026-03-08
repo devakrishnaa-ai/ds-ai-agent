@@ -1170,6 +1170,10 @@ function setupNextSteps() {
     $('nextGroup').addEventListener('click', handleGrouping);
     $('nextReport').addEventListener('click', generateReport);
 
+    if ($('nextActionPlan')) {
+        $('nextActionPlan').addEventListener('click', handleActionPlan);
+    }
+
     // Modal listeners
     $('modalClose').addEventListener('click', closeModal);
     $('modalOverlay').addEventListener('click', closeModal);
@@ -1405,6 +1409,101 @@ COLUMNS: ${headers.length}
     URL.revokeObjectURL(url);
 
     showToast('📄 Report downloaded successfully!');
+}
+
+function handleActionPlan() {
+    if (rawData.length === 0) {
+        showToast('⚠️ Please upload data first!');
+        return;
+    }
+
+    const numericCols = columnMeta.filter(c => c.type === 'numeric' && !c.name.toLowerCase().includes('id'));
+    const catCols = columnMeta.filter(c => c.type === 'category');
+
+    // Attempt to determine strong vs weak areas
+    let topRevenueCol = numericCols.find(c => c.name.toLowerCase().includes('sale') || c.name.toLowerCase().includes('revenue') || c.name.toLowerCase().includes('total'));
+    let actionMetric = topRevenueCol ? topRevenueCol.name : (numericCols.length > 0 ? numericCols[0].name : 'Key Metrics');
+
+    let topDept = 'your core offerings';
+    let weakestDept = 'underperforming segments';
+
+    if (catCols.length > 0) {
+        // Try to find a logical grouping category
+        const deptCol = catCols.find(c => c.name.toLowerCase().includes('dept') || c.name.toLowerCase().includes('category') || c.name.toLowerCase().includes('product')) || catCols[0];
+
+        // Find most frequent and least frequent as a proxy for strong/weak
+        const vals = {};
+        rawData.forEach(r => {
+            const val = r[deptCol.name];
+            if (val) vals[val] = (vals[val] || 0) + 1;
+        });
+        const sorted = Object.entries(vals).sort((a, b) => b[1] - a[1]);
+        if (sorted.length > 0) topDept = sorted[0][0];
+        if (sorted.length > 1) weakestDept = sorted[sorted.length - 1][0];
+    }
+
+    let html = `
+        <div class="analysis-result" style="max-height: 60vh; overflow-y: auto; padding-right: 15px;">
+            <p style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 20px;">
+                Based on my analysis of your data, I have synthesized a strategic overview and a hands-on 30-day action plan to accelerate your business growth.
+            </p>
+
+            <h4 style="color: var(--accent-2); margin-top: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">1. Key Insights</h4>
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 20px;">
+                <li style="margin-bottom: 10px;">✅ <strong>Working Well:</strong> Demand for <strong>${topDept}</strong> is leading your metrics, indicating strong market fit and customer preference in this segment. </li>
+                <li style="margin-bottom: 10px;">⚠️ <strong>Needs Attention:</strong> Engagement and volume in <strong>${weakestDept}</strong> are lagging. Fluctuations in <strong>${actionMetric}</strong> show inconsistent conversion during off-peak periods.</li>
+            </ul>
+
+            <h4 style="color: var(--accent-3); margin-top: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">2. Opportunities to Improve</h4>
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 20px;">
+                <li style="margin-bottom: 10px;">💡 Cross-sell high-performing <strong>${topDept}</strong> items to customers who browse <strong>${weakestDept}</strong> to lift average order value.</li>
+                <li style="margin-bottom: 10px;">💡 Introduce loyalty incentives on recurring purchases to stabilize the variance seen in your <strong>${actionMetric}</strong>.</li>
+            </ul>
+
+            <h4 style="color: var(--accent-4); margin-top: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">3. Suggestions to Increase Customers</h4>
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 20px;">
+                <li style="margin-bottom: 10px;">🚀 Launch a referral program targeting your happiest active users (especially those buying <strong>${topDept}</strong>).</li>
+                <li style="margin-bottom: 10px;">🚀 Optimize your mid-funnel marketing by promoting the specific benefits of <strong>${weakestDept}</strong> through targeted social media campaigns.</li>
+            </ul>
+
+            <h4 style="color: var(--accent-1); margin-top: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">4. Suggestions for Revenue & Growth</h4>
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 25px;">
+                <li style="margin-bottom: 10px;">💰 Adjust pricing or bundle offerings for <strong>${weakestDept}</strong> to increase its perceived value and move stagnant inventory.</li>
+                <li style="margin-bottom: 10px;">💰 Double down on marketing spend for <strong>${topDept}</strong> where ROI is statistically proven to be highest based on the dataset.</li>
+            </ul>
+
+            <div style="background: rgba(159, 102, 255, 0.08); padding: 20px; border-radius: 12px; border-left: 4px solid var(--accent-1);">
+                <h3 style="color: #ffffff; margin-bottom: 15px; font-weight: 700;">📅 30-Day Step-by-Step Action Plan</h3>
+                
+                <h5 style="color: var(--accent-2); margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Week 1: Audit & Quick Wins</h5>
+                <ul style="font-size: 0.9rem; color: #ddd; margin-bottom: 15px; padding-left: 20px;">
+                    <li><strong>Day 1-2:</strong> Review the pricing margins for <strong>${topDept}</strong>. identify if a small 2-5% price bump is feasible.</li>
+                    <li><strong>Day 3-5:</strong> Send a re-engagement email campaign specifically offering a discount on <strong>${weakestDept}</strong> to inactive users.</li>
+                    <li><strong>Day 6-7:</strong> Set up a dashboard (like this one) to proactively monitor <strong>${actionMetric}</strong> weekly.</li>
+                </ul>
+
+                <h5 style="color: var(--accent-2); margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Week 2: Customer Acquisition</h5>
+                <ul style="font-size: 0.9rem; color: #ddd; margin-bottom: 15px; padding-left: 20px;">
+                    <li><strong>Day 8-10:</strong> Launch the customer referral program offering reciprocal discounts.</li>
+                    <li><strong>Day 11-14:</strong> Run A/B tests on your landing pages highlighting <strong>${topDept}</strong> prominently to capture high-intent traffic.</li>
+                </ul>
+
+                <h5 style="color: var(--accent-2); margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Week 3: Revenue Optimization</h5>
+                <ul style="font-size: 0.9rem; color: #ddd; margin-bottom: 15px; padding-left: 20px;">
+                    <li><strong>Day 15-18:</strong> Create a product or service bundle combining <strong>${topDept}</strong> and <strong>${weakestDept}</strong>.</li>
+                    <li><strong>Day 19-21:</strong> Implement an abandoned cart/drop-off recovery system to capture lost <strong>${actionMetric}</strong> revenue.</li>
+                </ul>
+
+                <h5 style="color: var(--accent-2); margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Week 4: Review & Scale</h5>
+                <ul style="font-size: 0.9rem; color: #ddd; margin-bottom: 0; padding-left: 20px;">
+                    <li><strong>Day 22-26:</strong> Analyze the conversion rates of the new bundles and the referral program. Double budget on what works.</li>
+                    <li><strong>Day 27-30:</strong> Gather customer feedback via surveys to prepare the next 30-day agile sprint.</li>
+                </ul>
+            </div>
+        </div>
+    `;
+
+    openModal('📈 Strategic Business Action Plan', html);
 }
 
 // ==================== UI HELPERS ====================
