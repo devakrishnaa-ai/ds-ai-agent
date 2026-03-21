@@ -31,7 +31,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNextSteps();
     setupChat();
     setupShield();
+    setupMobileMenu();
 });
+
+// ==================== MOBILE MENU ====================
+function setupMobileMenu() {
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const headerRight = document.getElementById('headerRight');
+    if (!hamburgerBtn || !headerRight) return;
+
+    hamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        headerRight.classList.toggle('mobile-open');
+        // Toggle hamburger icon to X
+        const isOpen = headerRight.classList.contains('mobile-open');
+        hamburgerBtn.innerHTML = isOpen
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!headerRight.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+            headerRight.classList.remove('mobile-open');
+            hamburgerBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+        }
+    });
+}
 
 // ==================== 3D BACKGROUND (THREE.JS) — NEW DESIGN MOTION ====================
 let scene, camera, renderer, particles, connections;
