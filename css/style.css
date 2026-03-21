@@ -626,6 +626,7 @@ h6,
     padding: 32px;
     backdrop-filter: blur(20px);
     transition: var(--transition);
+    overflow: hidden;
 }
 
 .dash-section:hover {
@@ -797,6 +798,9 @@ h6,
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
     gap: 20px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .viz-3d-wrapper {
@@ -841,6 +845,8 @@ h6,
     transition: var(--transition);
     overflow: hidden;
     min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .chart-card:hover {
@@ -864,11 +870,11 @@ h6,
     width: 100%;
     height: 280px;
     max-width: 100%;
+    overflow: hidden;
 }
 
 .chart-container canvas {
     max-width: 100% !important;
-    height: auto !important;
 }
 
 /* Insights */

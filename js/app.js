@@ -950,8 +950,13 @@ function renderCharts(stats) {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'right',
-                            labels: { color: '#ffffff', padding: 15, font: { size: 12, family: 'Inter' } }
+                            position: window.innerWidth <= 768 ? 'bottom' : 'right',
+                            labels: { 
+                                color: '#ffffff', 
+                                padding: window.innerWidth <= 480 ? 8 : 15, 
+                                font: { size: window.innerWidth <= 480 ? 10 : 12, family: 'Inter' },
+                                boxWidth: window.innerWidth <= 480 ? 12 : 40
+                            }
                         }
                     }
                 }
@@ -1097,22 +1102,47 @@ function createChartCard(title, parent) {
 }
 
 function chartOptions(yLabel) {
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth <= 768;
+    const fontSize = isMobile ? 8 : (isTablet ? 10 : 12);
+    const tickSize = isMobile ? 8 : 10;
+    
     return {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                labels: { color: '#ffffff', font: { size: 12, family: 'Inter' } }
+                labels: { 
+                    color: '#ffffff', 
+                    font: { size: fontSize, family: 'Inter' },
+                    boxWidth: isMobile ? 12 : 40,
+                    padding: isMobile ? 6 : 10
+                }
             }
         },
         scales: {
             x: {
-                ticks: { color: '#888888', font: { size: 10, family: 'Inter' }, maxRotation: 45 },
+                ticks: { 
+                    color: '#888888', 
+                    font: { size: tickSize, family: 'Inter' }, 
+                    maxRotation: isMobile ? 90 : 45,
+                    autoSkip: true,
+                    maxTicksLimit: isMobile ? 6 : 12
+                },
                 grid: { color: 'rgba(255,255,255,0.08)' }
             },
             y: {
-                title: { display: true, text: yLabel, color: '#ffffff', font: { size: 12, family: 'Inter' } },
-                ticks: { color: '#888888', font: { size: 10, family: 'Inter' } },
+                title: { 
+                    display: !isMobile, 
+                    text: yLabel, 
+                    color: '#ffffff', 
+                    font: { size: fontSize, family: 'Inter' } 
+                },
+                ticks: { 
+                    color: '#888888', 
+                    font: { size: tickSize, family: 'Inter' },
+                    maxTicksLimit: isMobile ? 5 : 10
+                },
                 grid: { color: 'rgba(255,255,255,0.08)' }
             }
         }
